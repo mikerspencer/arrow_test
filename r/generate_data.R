@@ -8,10 +8,10 @@ library(tidyverse)
 
 # ---------------------------------
 # Demographic
-sample_size = 500000
+sample_size = 1200000
 
 
-cid = paste0(sample(1:26, 500000, replace = TRUE), sample(100000000:999999999, sample_size))
+cid = paste0(sample(0:9, 500000, replace = TRUE), sample(100000000:999999999, sample_size))
 #postal_district
 #age_band
 sex = sample(c("M", "F"), 500000, replace = TRUE)
@@ -22,8 +22,8 @@ sex = sample(c("M", "F"), 500000, replace = TRUE)
 
 dates = seq.Date(as.Date("2019-01-06"), by = 7, to = today())
 
-if(!dir.exists("data")){
-  dir.create("data")
+if(!dir.exists("data_in")){
+  dir.create("data_in")
 }
 
 parallel::mclapply(dates, mc.cores = 6, function(i){
