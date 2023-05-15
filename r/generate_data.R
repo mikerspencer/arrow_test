@@ -8,7 +8,7 @@ library(tidyverse)
 
 # ---------------------------------
 # Demographic
-sample_size = 1200000
+sample_size = 500000
 
 
 cid = paste0(sample(0:9, sample_size, replace = TRUE), sample(100000000:999999999, sample_size))
