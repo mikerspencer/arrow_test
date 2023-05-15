@@ -11,10 +11,10 @@ library(tidyverse)
 sample_size = 1200000
 
 
-cid = paste0(sample(0:9, 500000, replace = TRUE), sample(100000000:999999999, sample_size))
+cid = paste0(sample(0:9, sample_size, replace = TRUE), sample(100000000:999999999, sample_size))
 #postal_district
 #age_band
-sex = sample(c("M", "F"), 500000, replace = TRUE)
+sex = sample(c("M", "F"), sample_size, replace = TRUE)
 
 
 # ---------------------------------
