@@ -1,0 +1,123 @@
+---
+title: "Arrow_summary"
+author: "Mike Spencer"
+format: gfm
+editor: visual
+---
+
+## Intro
+
+Doc trials different ways of reading data.
+
+```{r}
+library(tidyverse)
+library(arrow)
+```
+
+
+## csv
+
+### Single file, readr
+
+```{r}
+tick = proc.time()
+f = list.files("data_in", full.names = TRUE)
+
+parallel::mclapply(f, mc.cores = 8, function(i){
+read_csv(i) %>% 
+    group_by(sex) %>% 
+    summarise(end_of_this_period = unique(end_of_this_period),
+              mean_income = mean(income),
+              overdraft_users = sum(cash_min < 0))
+}) %>% 
+  bind_rows()
+
+tock_csv_single_readr = proc.time()[3] - tick[3]
+```
+
+### Single file, arrow
+
+```{r}
+tick = proc.time()
+f = list.files("data_in", full.names = TRUE)
+
+parallel::mclapply(f, mc.cores = 8, function(i){
+read_csv_arrow(i) %>% 
+    group_by(sex) %>% 
+    summarise(end_of_this_period = unique(end_of_this_period),
+              mean_income = mean(income),
+              overdraft_users = sum(cash_min < 0))
+}) %>% 
+  bind_rows()
+
+tock_csv_single_arrow = proc.time()[3] - tick[3]
+```
+
+### Dataset, arrow
+
+```{r}
+tick = proc.time()
+f = list.files("data_in", full.names = TRUE)
+
+open_csv_dataset(f) %>% 
+    group_by(end_of_this_period, sex) %>% 
+    summarise(mean_income = mean(income),
+              overdraft_users = sum(cash_min < 0)) %>% 
+  collect()
+
+tock_csv_dataset_arrow = proc.time()[3] - tick[3]
+```
+
+
+## Parquet
+
+### Single file
+
+```{r}
+tick = proc.time()
+f = list.files("data_part_date", recursive = T, full.names = TRUE)
+
+parallel::mclapply(f, mc.cores = 8, function(i){
+read_parquet(i) %>% 
+    group_by(sex) %>% 
+    summarise(end_of_this_period = as.Date(str_sub(i, 35, 44)),
+              mean_income = mean(income),
+              overdraft_users = sum(cash_min < 0))
+}) %>% 
+  bind_rows()
+
+tock_parquet_single_arrow = proc.time()[3] - tick[3]
+```
+
+
+### Dataset
+
+```{r}
+tick = proc.time()
+
+open_dataset("data_part_date") %>% 
+    group_by(end_of_this_period, sex) %>% 
+    summarise(mean_income = mean(income),
+              overdraft_users = sum(cash_min < 0)) %>% 
+  collect()
+
+tock_parquet_dataset_arrow = proc.time()[3] - tick[3]
+```
+
+
+## Results
+
+```{r}
+tibble(method = c("csv_single_readr",
+                  "csv_single_arrow",
+                  "csv_dataset_arrow",
+                  "parquet_single_arrow",
+                  "parquet_dataset_arrow"),
+       time_seconds = c(tock_csv_single_readr,
+                  tock_csv_single_arrow,
+                  tock_csv_dataset_arrow,
+                  tock_parquet_single_arrow,
+                  tock_parquet_dataset_arrow)) %>% 
+  knitr::kable()
+```
+
