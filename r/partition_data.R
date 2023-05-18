@@ -25,7 +25,7 @@ if(!dir.exists(dir_out)){
 }
 
 ds %>%
-  group_by(str_sub(end_of_this_period, 1, 7)) %>%
+  group_by(end_of_this_period) %>%
   write_dataset(dir_out)
 
 
