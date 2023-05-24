@@ -1,20 +1,31 @@
+
+QUARTO = quarto
+R = Rscript
+
 QMDFILE = arrow_summary.qmd
 MDFILE = $(QMDFILE:.qmd=.md)
 
 # Scripts
 GENERATE = r/generate_data.R
 PARTITION = r/partition_data.R
+
+RAW_DIR = data_in
+OUTPUT_DIR = data_part_date
+
 # Data
-DATA_RAW = $(wildcard data_in/*.csv)
-DATA_PART = $(wildcard data_part_date/*/part-0.parquet)
+DATA_RAW = $(wildcard $(RAW_DIR)/*.csv)
+DATA_PART = $(wildcard $(OUTPUT_DIR)/*/part-0.parquet)
 
-all: $(MDFILE)
+all: report
 
-$(MDFILE): $(DATA_PART)
-	quarto render $(QMDFILE)
+report: $(QMDFILE) dataparts
+	$(QUARTO) render $(QMDFILE)
 
-$(DATA_RAW): $(GENERATE)
-	Rscript $(GENERATE)
+dataparts: $(PARTITION) rawparts
+	$(R) $(PARTITION)
+	echo Files $(DATA_RAW) generated
 
-$(DATA_PART): $(PARTITION)
-	Rscript $(PARTITION)
+rawparts: $(GENERATE)
+	$(R) $(GENERATE)
+	echo Files $(DATA_PART) generated
+
