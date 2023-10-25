@@ -18,3 +18,4 @@ Testing Arrow performance
 * [Arrow and R cookbook](https://arrow.apache.org/cookbook/r/)
 * [Arrow and Python cookbook](https://arrow.apache.org/cookbook/py/index.html)
 * [Danielle Navarro's arrow writing](https://blog.djnavarro.net/index.html#category=Apache%20Arrow)
+* [Avaiable functions](https://arrow.apache.org/docs/r/reference/acero.html)
